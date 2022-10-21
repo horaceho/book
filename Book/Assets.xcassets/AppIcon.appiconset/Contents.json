@@ -11,11 +11,13 @@
       "size" : "20x20"
     },
     {
+      "filename" : "Icon_29x29@2x.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "29x29"
     },
     {
+      "filename" : "Icon_29x29@3x.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "29x29"
@@ -31,13 +33,13 @@
       "size" : "40x40"
     },
     {
-      "filename" : "icon-120.png",
+      "filename" : "Icon_60x60@2x.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "60x60"
     },
     {
-      "filename" : "icon-180.png",
+      "filename" : "Icon_60x60@3x.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "60x60"
@@ -63,35 +65,37 @@
       "size" : "29x29"
     },
     {
+      "filename" : "Icon_40x40@1x.png",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "40x40"
     },
     {
+      "filename" : "Icon_40x40@2x.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "40x40"
     },
     {
-      "filename" : "icon-76.png",
+      "filename" : "Icon_76x76@1x.png",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "76x76"
     },
     {
-      "filename" : "icon-152.png",
+      "filename" : "Icon_76x76@2x.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "76x76"
     },
     {
-      "filename" : "icon-167.png",
+      "filename" : "Icon_83.5x83.5@2x.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "83.5x83.5"
     },
     {
-      "filename" : "icon-1024.png",
+      "filename" : "Icon_1024x1024.png",
       "idiom" : "ios-marketing",
       "scale" : "1x",
       "size" : "1024x1024"
@@ -122,7 +126,6 @@
       "size" : "128x128"
     },
     {
-      "filename" : "Orca-256-macos.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "128x128"
@@ -133,19 +136,16 @@
       "size" : "256x256"
     },
     {
-      "filename" : "Orca-512-macos.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "256x256"
     },
     {
-      "filename" : "Orca-512-macos-store.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "512x512"
     },
     {
-      "filename" : "Orca-1024-macos-store.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "512x512"
