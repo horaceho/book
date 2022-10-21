@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F50EF51329014C430091AC37 /* WatchOS9.pdf in Resources */ = {isa = PBXBuildFile; fileRef = F50EF51229014C420091AC37 /* WatchOS9.pdf */; };
 		F50EF5162901512D0091AC37 /* PDFKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F50EF5152901512D0091AC37 /* PDFKit.framework */; };
 		F5F051F12901205E00DD4849 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F051F02901205E00DD4849 /* AppDelegate.swift */; };
 		F5F051F32901205E00DD4849 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F051F22901205E00DD4849 /* SceneDelegate.swift */; };
@@ -15,10 +14,10 @@
 		F5F051F82901205E00DD4849 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F5F051F62901205E00DD4849 /* Main.storyboard */; };
 		F5F051FA2901205F00DD4849 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5F051F92901205F00DD4849 /* Assets.xcassets */; };
 		F5F051FD2901205F00DD4849 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F5F051FB2901205F00DD4849 /* LaunchScreen.storyboard */; };
+		F5F37FC929025B08008B9D9E /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F5F37FC829025B08008B9D9E /* Settings.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		F50EF51229014C420091AC37 /* WatchOS9.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = WatchOS9.pdf; sourceTree = SOURCE_ROOT; };
 		F50EF5152901512D0091AC37 /* PDFKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PDFKit.framework; path = System/Library/Frameworks/PDFKit.framework; sourceTree = SDKROOT; };
 		F5F051ED2901205E00DD4849 /* Book.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Book.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5F051F02901205E00DD4849 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -28,6 +27,7 @@
 		F5F051F92901205F00DD4849 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F5F051FC2901205F00DD4849 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F5F051FE2901205F00DD4849 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F5F37FC829025B08008B9D9E /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +54,7 @@
 			isa = PBXGroup;
 			children = (
 				F5F051EF2901205E00DD4849 /* Book */,
+				F5F37FC829025B08008B9D9E /* Settings.bundle */,
 				F5F051EE2901205E00DD4849 /* Products */,
 				F50EF5142901512D0091AC37 /* Frameworks */,
 			);
@@ -77,7 +78,6 @@
 				F5F051F92901205F00DD4849 /* Assets.xcassets */,
 				F5F051FB2901205F00DD4849 /* LaunchScreen.storyboard */,
 				F5F051FE2901205F00DD4849 /* Info.plist */,
-				F50EF51229014C420091AC37 /* WatchOS9.pdf */,
 			);
 			path = Book;
 			sourceTree = "<group>";
@@ -142,7 +142,7 @@
 			files = (
 				F5F051FD2901205F00DD4849 /* LaunchScreen.storyboard in Resources */,
 				F5F051FA2901205F00DD4849 /* Assets.xcassets in Resources */,
-				F50EF51329014C430091AC37 /* WatchOS9.pdf in Resources */,
+				F5F37FC929025B08008B9D9E /* Settings.bundle in Resources */,
 				F5F051F82901205E00DD4849 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

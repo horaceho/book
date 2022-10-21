@@ -52,6 +52,26 @@ class ViewController: UIViewController {
             name: Notification.Name("loadUrl"),
             object: nil
         )
+
+        let doubleTap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.handleDoubleTap(sender:)))
+        doubleTap.numberOfTapsRequired = 2
+        pdfView?.addGestureRecognizer(doubleTap)
+
+        let singleTap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.handleSingleTap(sender:)))
+        singleTap.numberOfTapsRequired = 1
+        singleTap.require(toFail: doubleTap)
+        pdfView?.addGestureRecognizer(singleTap)
+
+        doubleTap.delaysTouchesBegan = true
+        singleTap.delaysTouchesBegan = true
+    }
+
+    @objc func handleSingleTap(sender: AnyObject?) {
+        pdfView?.goToNextPage(nil)
+    }
+
+    @objc func handleDoubleTap(sender: AnyObject?) {
+        pdfView?.goToPreviousPage(nil)
     }
 
     @objc func openUrl(notification: Notification) {
@@ -64,24 +84,21 @@ class ViewController: UIViewController {
         pdfView?.document = document
         pdfView?.autoScales = true
         pdfView?.displayMode = .singlePage
-    }
+        pdfView?.pageShadowsEnabled = false
 
-    @IBAction func tapInsideBookButton() {
-        openBook()
+        if let color = UserDefaults.standard.object(forKey: "background") as? String? ?? ".clear" {
+            for view in pdfView?.subviews ?? [] {
+                view.backgroundColor = color == ".clear" ? .clear : .white
+            }
+        }
     }
 
     @IBAction func tapInsidePrevButton() {
         pdfView?.goToPreviousPage(nil)
-        pdfView?.backgroundColor = .clear
     }
 
     @IBAction func tapInsideNextButton() {
         pdfView?.goToNextPage(nil)
-        pdfView?.backgroundColor = .clear
-    }
-
-    @IBAction func tapInsideTrashButton() {
-      // do something
     }
 
     @IBAction func handleTap(_ gesture: UITapGestureRecognizer) {
@@ -102,17 +119,6 @@ class ViewController: UIViewController {
         )
 
         gesture.setTranslation(.zero, in: view)
-    }
-
-    func openBook()
-    {
-        if let pdfUrl = Bundle.main.url(forResource: "WatchOS9", withExtension: "pdf") {
-            let document = PDFDocument(url: pdfUrl)
-
-            pdfView?.document = document
-            pdfView?.autoScales = true
-            pdfView?.displayMode = .singlePage
-        }
     }
 
 }
