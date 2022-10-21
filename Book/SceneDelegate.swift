@@ -18,6 +18,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let _ = (scene as? UIWindowScene) else { return }
     }
 
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        if let url = URLContexts.first?.url, url.startAccessingSecurityScopedResource() {
+            defer  {
+                url.stopAccessingSecurityScopedResource()
+            }
+            NotificationCenter.default.post(name: NSNotification.Name("loadUrl"), object: self, userInfo: [
+                "url": url
+            ])
+        }
+    }
+
     func sceneDidDisconnect(_ scene: UIScene) {
         // Called as the scene is being released by the system.
         // This occurs shortly after the scene enters the background, or when its session is discarded.

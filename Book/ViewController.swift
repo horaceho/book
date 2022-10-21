@@ -11,7 +11,6 @@ import PDFKit
 class ViewController: UIViewController {
 
     @IBOutlet weak var pdfView: PDFView?
-    var pdfDocument: PDFDocument?
 
     @IBOutlet var infoText: UITextView!
     @IBOutlet var bookButton: UIView!
@@ -26,11 +25,19 @@ class ViewController: UIViewController {
     }
 
     override func viewWillAppear(_ animated: Bool) {
-        //
+        print("viewWillAppear")
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        print("viewDidAppear")
     }
 
     override func viewWillDisappear(_ animated: Bool) {
-        //
+        print("viewWillDisappear")
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        print("viewDidDisappear")
     }
 
     override func viewDidLoad() {
@@ -38,22 +45,41 @@ class ViewController: UIViewController {
 
         let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:)))
         view.addGestureRecognizer(tap)
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(openUrl(notification:)),
+            name: Notification.Name("loadUrl"),
+            object: nil
+        )
+    }
+
+    @objc func openUrl(notification: Notification) {
+        guard
+            let url = notification.userInfo?["url"] as? URL
+        else { return }
         
-        infoText.text = "Hi"
+        let document = PDFDocument(url: url)
+
+        pdfView?.document = document
+        pdfView?.autoScales = true
+        pdfView?.displayMode = .singlePage
     }
 
     @IBAction func tapInsideBookButton() {
         openBook()
     }
-    
+
     @IBAction func tapInsidePrevButton() {
-      // do something
+        pdfView?.goToPreviousPage(nil)
+        pdfView?.backgroundColor = .clear
     }
 
     @IBAction func tapInsideNextButton() {
-      // do something
+        pdfView?.goToNextPage(nil)
+        pdfView?.backgroundColor = .clear
     }
-    
+
     @IBAction func tapInsideTrashButton() {
       // do something
     }
@@ -77,16 +103,16 @@ class ViewController: UIViewController {
 
         gesture.setTranslation(.zero, in: view)
     }
-    
+
     func openBook()
     {
         if let pdfUrl = Bundle.main.url(forResource: "WatchOS9", withExtension: "pdf") {
             let document = PDFDocument(url: pdfUrl)
 
-            // Set our document to the view, center it, and set a background color
             pdfView?.document = document
             pdfView?.autoScales = true
-//            pdfView?.backgroundColor = UIColor.lightGray
+            pdfView?.displayMode = .singlePage
         }
     }
+
 }
