@@ -86,7 +86,7 @@ class ViewController: UIViewController {
         pdfView?.displayMode = .singlePage
         pdfView?.pageShadowsEnabled = false
 
-        if let color = UserDefaults.standard.object(forKey: "background") as? String? ?? ".clear" {
+        if let color = UserDefaults.standard.object(forKey: "background") as? String? ?? ".white" {
             for view in pdfView?.subviews ?? [] {
                 view.backgroundColor = color == ".clear" ? .clear : .white
             }
