@@ -22,7 +22,7 @@
                                 <color key="backgroundColor" red="0.97288292646408081" green="0.97436553239822388" blue="0.92440634965896606" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" id="Av9-6R-5ge">
-                                <rect key="frame" x="300" y="20" width="48" height="48"/>
+                                <rect key="frame" x="320" y="24" width="48" height="48"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="24"/>

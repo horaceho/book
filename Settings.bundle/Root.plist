@@ -34,7 +34,7 @@
 			<key>Key</key>
 			<string>hiddenStatusBar</string>
 			<key>DefaultValue</key>
-			<true/>
+			<false/>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -44,7 +44,17 @@
 			<key>Key</key>
 			<string>hiddenHomeBar</string>
 			<key>DefaultValue</key>
-			<true/>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Dim Menu Button</string>
+			<key>Key</key>
+			<string>dimMenuButton</string>
+			<key>DefaultValue</key>
+			<false/>
 		</dict>
 		<dict>
 			<key>Type</key>

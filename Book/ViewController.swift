@@ -10,8 +10,8 @@ import PDFKit
 
 class ViewController: UIViewController {
 
-    var hiddenHomeBar: Bool = true
-    var hiddenStatusBar: Bool = true
+    var hiddenHomeBar: Bool = false
+    var hiddenStatusBar: Bool = false
 
     @IBOutlet weak var pdfView: PDFView?
 
@@ -155,8 +155,9 @@ class ViewController: UIViewController {
         if UserDefaults.standard.bool(forKey: "reset") {
             UserDefaults.standard.set(false, forKey: "reset")
             UserDefaults.standard.set(".white", forKey: "background")
-            UserDefaults.standard.set(true, forKey: "hiddenHomeBar")
-            UserDefaults.standard.set(true, forKey: "hiddenStatusBar")
+            UserDefaults.standard.set(false, forKey: "hiddenHomeBar")
+            UserDefaults.standard.set(false, forKey: "hiddenStatusBar")
+            UserDefaults.standard.set(false, forKey: "dimMenuButton")
         }
 
         hiddenHomeBar = UserDefaults.standard.bool(forKey: "hiddenHomeBar")
@@ -165,6 +166,9 @@ class ViewController: UIViewController {
         hiddenStatusBar = UserDefaults.standard.bool(forKey: "hiddenStatusBar")
         UIView.animate(withDuration: 0.25, animations: {
             self.setNeedsStatusBarAppearanceUpdate()
+
+            let alpha = UserDefaults.standard.bool(forKey: "dimMenuButton") ? 0.2 : 1.0
+            self.menuButton.alpha = alpha
         })
     }
 }
