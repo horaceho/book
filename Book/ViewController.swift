@@ -10,18 +10,27 @@ import PDFKit
 
 class ViewController: UIViewController {
 
+    var hiddenHomeBar: Bool = true
+    var hiddenStatusBar: Bool = true
+
     @IBOutlet weak var pdfView: PDFView?
 
-    @IBOutlet var infoText: UITextView!
-    @IBOutlet var bookButton: UIView!
+    @IBOutlet var menuButton: UIView!
     @IBOutlet var prevButton: UIView!
     @IBOutlet var nextButton: UIView!
-    @IBOutlet var trashButton: UIView!
 
     @IBOutlet var configView: UIView! {
         didSet {
             configView.layer.cornerRadius = 8
         }
+    }
+
+    override var prefersHomeIndicatorAutoHidden: Bool {
+        return hiddenHomeBar
+    }
+
+    override var prefersStatusBarHidden: Bool {
+        return hiddenStatusBar
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -50,6 +59,13 @@ class ViewController: UIViewController {
             self,
             selector: #selector(openUrl(notification:)),
             name: Notification.Name("loadUrl"),
+            object: nil
+        )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleActive),
+            name: UIApplication.didBecomeActiveNotification,
             object: nil
         )
 
@@ -93,11 +109,24 @@ class ViewController: UIViewController {
         }
     }
 
+    @objc func handleActive() {
+        print("handleActive")
+        updateSettings()
+    }
+
+    @IBAction func tapInsideMenuButton() {
+        if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(settingsUrl)
+        }
+    }
+
     @IBAction func tapInsidePrevButton() {
+        print("tapInsidePrevButton")
         pdfView?.goToPreviousPage(nil)
     }
 
     @IBAction func tapInsideNextButton() {
+        print("tapInsideNextButton")
         pdfView?.goToNextPage(nil)
     }
 
@@ -121,4 +150,21 @@ class ViewController: UIViewController {
         gesture.setTranslation(.zero, in: view)
     }
 
+    func updateSettings() {
+        print("updateSettings")
+        if UserDefaults.standard.bool(forKey: "reset") {
+            UserDefaults.standard.set(false, forKey: "reset")
+            UserDefaults.standard.set(".white", forKey: "background")
+            UserDefaults.standard.set(true, forKey: "hiddenHomeBar")
+            UserDefaults.standard.set(true, forKey: "hiddenStatusBar")
+        }
+
+        hiddenHomeBar = UserDefaults.standard.bool(forKey: "hiddenHomeBar")
+        self.setNeedsUpdateOfHomeIndicatorAutoHidden()
+
+        hiddenStatusBar = UserDefaults.standard.bool(forKey: "hiddenStatusBar")
+        UIView.animate(withDuration: 0.25, animations: {
+            self.setNeedsStatusBarAppearanceUpdate()
+        })
+    }
 }
