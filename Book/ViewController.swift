@@ -8,8 +8,75 @@
 import UIKit
 import PDFKit
 
+struct Book: Codable {
+    var hash: String
+    var name: URL
+    var page: Int = 0
+    var rect: CGRect = CGRectZero
+    var scale: CGFloat = 1.0
+}
+
+struct History: Codable {
+    var books: [Book] = []
+    var latest: String = ""
+
+    mutating func save(name url: URL, to page: Int, at rect: CGRect) {
+        latest = String(format:"%02X", url.hashValue)
+        if let index = books.firstIndex(where: { $0.hash == latest }) {
+            books[index].page = page
+            books[index].rect = rect
+        } else {
+            books.append(Book(
+                hash: latest,
+                name: url,
+                page: page,
+                rect: rect
+            ))
+        }
+        saveToDefaults()
+    }
+
+    mutating func save(name url: URL, at rect: CGRect, of scale: CGFloat) {
+        latest = String(format:"%02X", url.hashValue)
+        if let index = books.firstIndex(where: { $0.hash == latest }) {
+            books[index].scale = scale
+            books[index].rect = rect
+        } else {
+            books.append(Book(
+                hash: latest,
+                name: url,
+                rect: rect,
+                scale: scale
+            ))
+        }
+        saveToDefaults()
+    }
+
+    func saveToDefaults() {
+        if let data = try? JSONEncoder().encode(books) {
+            UserDefaults.standard.set(data, forKey: "history")
+        }
+        UserDefaults.standard.set(latest, forKey: "latest")
+        UserDefaults.standard.synchronize()
+        debugPrint("save \(latest)")
+    }
+
+    mutating func load() {
+        if let hash = UserDefaults.standard.string(forKey: "latest") {
+            latest = hash
+        }
+        if let data = UserDefaults.standard.data(forKey: "history") {
+            if let decoded = try? JSONDecoder().decode([Book].self, from: data) {
+                books = decoded
+            }
+        }
+        debugPrint("load \(latest)")
+    }
+}
+
 class ViewController: UIViewController {
 
+    var history = History(books: [])
     var hiddenHomeBar: Bool = false
     var hiddenStatusBar: Bool = false
 
@@ -73,28 +140,28 @@ class ViewController: UIViewController {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleDocumentChanged(notification:)),
-            name: Notification.Name.PDFViewDocumentChanged,
+            name: .PDFViewDocumentChanged,
             object: nil
         )
 
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handlePageChanged(notification:)),
-            name: Notification.Name.PDFViewPageChanged,
+            name: .PDFViewPageChanged,
             object: nil
         )
 
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleDisplayBoxChanged(notification:)),
-            name: Notification.Name.PDFViewDisplayBoxChanged,
+            name: .PDFViewDisplayBoxChanged,
             object: nil
         )
 
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleScaleChanged(notification:)),
-            name: Notification.Name.PDFViewScaleChanged,
+            name: .PDFViewScaleChanged,
             object: nil
         )
 
@@ -122,20 +189,22 @@ class ViewController: UIViewController {
     }
 
     @objc func handleDocumentChanged(notification: Notification) {
-        if let pdf = pdfView {
-            if let doc = pdf.document {
-                if let url = doc.documentURL {
-                    debugPrint("handleDocumentChanged: \(url)")
-                }
-            }
+        if let pdf = pdfView,
+           let doc = pdf.document,
+           let url = doc.documentURL {
+            debugPrint("handleDocumentChanged: \(url)")
         }
     }
 
     @objc func handlePageChanged(notification: Notification) {
-        if let pdf = pdfView {
-            if let page = pdf.currentPage {
-                debugPrint("handlePageChanged: \(page)")
-            }
+        if let pdf = pdfView,
+           let doc = pdf.document,
+           let url = doc.documentURL,
+           let page = pdf.currentPage {
+            let index = doc.index(for: page)
+            let rect = pdf.convert(pdf.bounds, to:page)
+            history.save(name: url, to: index, at: rect)
+            debugPrint("handleDocumentChanged: \(index)")
         }
     }
 
@@ -146,8 +215,14 @@ class ViewController: UIViewController {
     }
 
     @objc func handleScaleChanged(notification: Notification) {
-        if let pdf = pdfView {
-            debugPrint("handleScaleChanged: \(pdf.scaleFactor)")
+        if let pdf = pdfView,
+           let doc = pdf.document,
+           let url = doc.documentURL,
+           let page = pdf.currentPage {
+            let rect = pdf.convert(pdf.bounds, to:page)
+            let scale = pdf.scaleFactor
+            history.save(name: url, at: rect, of: scale)
+            debugPrint("handleScaleChanged: \(scale)")
         }
     }
 
@@ -164,14 +239,17 @@ class ViewController: UIViewController {
         pdfView?.pageShadowsEnabled = false
 
         if let color = UserDefaults.standard.object(forKey: "background") as? String? ?? ".white" {
-            for view in pdfView?.subviews ?? [] {
-                view.backgroundColor = color == ".clear" ? .clear : .white
-            }
+            let toSet: UIColor = (color == ".clear") ? .clear : .white
+//            for view in pdfView?.subviews ?? [] {
+//                view.backgroundColor = toSet
+//            }
+            pdfView?.backgroundColor = toSet
         }
     }
 
     @objc func handleActive() {
         print("handleActive")
+        updateHistory()
         updateSettings()
     }
 
@@ -215,6 +293,11 @@ class ViewController: UIViewController {
         gesture.setTranslation(.zero, in: view)
     }
 
+    func updateHistory() {
+        print("updateHistory")
+        history.load()
+    }
+
     func updateSettings() {
         print("updateSettings")
         if UserDefaults.standard.bool(forKey: "reset") {
@@ -238,15 +321,8 @@ class ViewController: UIViewController {
         })
     }
 
-    func debugPrintAll()
-    {
+    func debugPrintAll() {
         if let pdf = pdfView {
-            debugPrint(pdf)
-            if let doc = pdf.document {
-                if let url = doc.documentURL {
-                    debugPrint("handleDocumentChanged: \(url)")
-                }
-            }
             debugPrint("isUsingPageViewController: \(pdf.isUsingPageViewController)")
             debugPrint("backgroundColor: \(pdf.backgroundColor)")
             debugPrint("displaysPageBreaks: \(pdf.displaysPageBreaks)")
@@ -256,10 +332,15 @@ class ViewController: UIViewController {
             debugPrint("displaysRTL: \(pdf.displaysRTL)")
             debugPrint("scaleFactor: \(pdf.scaleFactor)")
             debugPrint("autoScales: \(pdf.autoScales)")
+            if let doc = pdf.document,
+               let url = doc.documentURL {
+                debugPrint("url: \(url)")
+            }
             if let page = pdf.page(for: CGPointZero, nearest: true) {
                 let rect = pdf.convert(pdf.bounds, to:page)
-                debugPrint("viewBounds: \(pdf.bounds) converted: \(rect)")
+                debugPrint("bounds: \(pdf.bounds) converted: \(rect)")
             }
+            debugPrint(history)
         }
     }
 }
