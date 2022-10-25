@@ -220,6 +220,8 @@ class ViewController: UIViewController {
     }
 
     @objc func handlePageChanged(notification: Notification) {
+        pdfView?.currentSelection = nil
+        pdfView?.clearSelection()
         history.save(pdfView: pdfView)
         debugPrint("handlePageChanged")
     }
