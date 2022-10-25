@@ -38,29 +38,33 @@ struct History: Codable {
             let tofit = pdf.scaleFactorForSizeToFit
             let file = url.lastPathComponent
             latest = String(format:"%02X", file.hashValue)
-            if let first = books.firstIndex(where: { $0.hash == latest }) {
-                books[first].page = index
-                books[first].rect = rect
-                books[first].scale = scale
-                books[first].tofit = tofit
-            } else {
-                books.append(Book(
-                    hash: latest,
-                    file: file,
-                    path: url,
-                    page: index,
-                    rect: rect,
-                    scale: scale,
-                    tofit: tofit
-                ))
-            }
+            if (index > 0) {
+                if let first = books.firstIndex(where: { $0.hash == latest }) {
+                    books[first].page = index
+                    books[first].rect = rect
+                    books[first].scale = scale
+                    books[first].tofit = tofit
+                } else {
+                    books.append(Book(
+                        hash: latest,
+                        file: file,
+                        path: url,
+                        page: index,
+                        rect: rect,
+                        scale: scale,
+                        tofit: tofit
+                    ))
+                }
 
-            if let data = try? JSONEncoder().encode(books) {
-                UserDefaults.standard.set(data, forKey: "history")
+                if let data = try? JSONEncoder().encode(books) {
+                    UserDefaults.standard.set(data, forKey: "history")
+                }
+                UserDefaults.standard.set(latest, forKey: "latest")
+                UserDefaults.standard.synchronize()
+                debugPrint("save \(latest)")
+            } else {
+                debugPrint("save \(latest) ignored")
             }
-            UserDefaults.standard.set(latest, forKey: "latest")
-            UserDefaults.standard.synchronize()
-            debugPrint("save \(latest)")
         }
     }
 
@@ -76,6 +80,14 @@ struct History: Codable {
         debugPrint("load \(latest)")
     }
 
+    func book(url: URL) -> Book? {
+        if let first = books.firstIndex(where: { $0.hash == url.hash() }) {
+            return books[first]
+        } else {
+            return nil
+        }
+    }
+
     func rect() -> CGRect {
         if let index = books.firstIndex(where: { $0.hash == latest }) {
             return books[index].rect
@@ -85,12 +97,26 @@ struct History: Codable {
 }
 
 extension PDFView {
+    func page() -> Int {
+        if let doc = self.document,
+           let page = self.currentPage {
+            let index = doc.index(for: page)
+            return index
+        }
+        return 0
+    }
     func rect() -> CGRect {
         if let page = self.currentPage {
             return self.convert(self.bounds, to:page)
         } else {
             return CGRectZero
         }
+    }
+}
+
+extension URL {
+    func hash() -> String {
+        return String(format:"%02X", self.lastPathComponent.hashValue)
     }
 }
 
@@ -220,10 +246,10 @@ class ViewController: UIViewController {
     }
 
     @objc func handlePageChanged(notification: Notification) {
+        debugPrint("handlePageChanged")
         pdfView?.currentSelection = nil
         pdfView?.clearSelection()
         history.save(pdfView: pdfView)
-        debugPrint("handlePageChanged")
     }
 
     @objc func handleDisplayBoxChanged(notification: Notification) {
@@ -231,28 +257,41 @@ class ViewController: UIViewController {
     }
 
     @objc func handleScaleChanged(notification: Notification) {
-        history.save(pdfView: pdfView)
         debugPrint("handleScaleChanged")
+        history.save(pdfView: pdfView)
     }
 
     @objc func handleTimer(sender: AnyObject?) {
-        if pdfView?.rect() != CGRectZero && pdfView?.rect() != history.rect() {
-            history.save(pdfView: pdfView)
-            debugPrint("handleTimer")
+        if let page = pdfView?.page() {
+            if page > 0 && pdfView?.rect() != CGRectZero && pdfView?.rect() != history.rect() {
+                debugPrint("handleTimer")
+                history.save(pdfView: pdfView)
+            }
         }
     }
 
     @objc func openUrl(notification: Notification) {
+        debugPrint("openUrl")
         guard
             let url = notification.userInfo?["url"] as? URL
         else { return }
         
-        let document = PDFDocument(url: url)
+        if let pdf = pdfView {
+            let document = PDFDocument(url: url)
+            pdf.document = document
 
-        pdfView?.document = document
-        pdfView?.autoScales = true
-        pdfView?.displayMode = .singlePage
-        pdfView?.pageShadowsEnabled = false
+            if let book = history.book(url: url) {
+                if let doc = pdf.document,
+                   let page = doc.page(at: book.page) {
+                    pdf.go(to: page)
+                }
+                pdf.displayMode = .singlePage
+            } else {
+                pdf.autoScales = true
+                pdf.displayMode = .singlePage
+            }
+            pdf.pageShadowsEnabled = false
+        }
 
         if let color = UserDefaults.standard.object(forKey: "background") as? String? ?? ".white" {
             let toSet: UIColor = (color == ".clear") ? .clear : .white
