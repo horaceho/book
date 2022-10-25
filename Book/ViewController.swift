@@ -10,55 +10,58 @@ import PDFKit
 
 struct Book: Codable {
     var hash: String
-    var name: URL
+    var file: String
+    var path: URL
     var page: Int = 0
     var rect: CGRect = CGRectZero
     var scale: CGFloat = 1.0
+    var tofit: CGFloat = 1.0
 }
 
 struct History: Codable {
     var books: [Book] = []
     var latest: String = ""
 
-    mutating func save(name url: URL, to page: Int, at rect: CGRect) {
-        latest = String(format:"%02X", url.hashValue)
-        if let index = books.firstIndex(where: { $0.hash == latest }) {
-            books[index].page = page
-            books[index].rect = rect
-        } else {
-            books.append(Book(
-                hash: latest,
-                name: url,
-                page: page,
-                rect: rect
-            ))
-        }
-        saveToDefaults()
+    mutating func reset() {
+        books = []
+        latest = ""
     }
 
-    mutating func save(name url: URL, at rect: CGRect, of scale: CGFloat) {
-        latest = String(format:"%02X", url.hashValue)
-        if let index = books.firstIndex(where: { $0.hash == latest }) {
-            books[index].scale = scale
-            books[index].rect = rect
-        } else {
-            books.append(Book(
-                hash: latest,
-                name: url,
-                rect: rect,
-                scale: scale
-            ))
-        }
-        saveToDefaults()
-    }
+    mutating func save(pdfView: PDFView?) {
+        if let pdf = pdfView,
+           let doc = pdf.document,
+           let url = doc.documentURL,
+           let page = pdf.currentPage {
+            let index = doc.index(for: page)
+            let rect = pdf.convert(pdf.bounds, to:page)
+            let scale = pdf.scaleFactor
+            let tofit = pdf.scaleFactorForSizeToFit
+            let file = url.lastPathComponent
+            latest = String(format:"%02X", file.hashValue)
+            if let first = books.firstIndex(where: { $0.hash == latest }) {
+                books[first].page = index
+                books[first].rect = rect
+                books[first].scale = scale
+                books[first].tofit = tofit
+            } else {
+                books.append(Book(
+                    hash: latest,
+                    file: file,
+                    path: url,
+                    page: index,
+                    rect: rect,
+                    scale: scale,
+                    tofit: tofit
+                ))
+            }
 
-    func saveToDefaults() {
-        if let data = try? JSONEncoder().encode(books) {
-            UserDefaults.standard.set(data, forKey: "history")
+            if let data = try? JSONEncoder().encode(books) {
+                UserDefaults.standard.set(data, forKey: "history")
+            }
+            UserDefaults.standard.set(latest, forKey: "latest")
+            UserDefaults.standard.synchronize()
+            debugPrint("save \(latest)")
         }
-        UserDefaults.standard.set(latest, forKey: "latest")
-        UserDefaults.standard.synchronize()
-        debugPrint("save \(latest)")
     }
 
     mutating func load() {
@@ -72,6 +75,23 @@ struct History: Codable {
         }
         debugPrint("load \(latest)")
     }
+
+    func rect() -> CGRect {
+        if let index = books.firstIndex(where: { $0.hash == latest }) {
+            return books[index].rect
+        }
+        return CGRectZero
+    }
+}
+
+extension PDFView {
+    func rect() -> CGRect {
+        if let page = self.currentPage {
+            return self.convert(self.bounds, to:page)
+        } else {
+            return CGRectZero
+        }
+    }
 }
 
 class ViewController: UIViewController {
@@ -79,6 +99,7 @@ class ViewController: UIViewController {
     var history = History(books: [])
     var hiddenHomeBar: Bool = false
     var hiddenStatusBar: Bool = false
+    weak var scheduler: Timer?
 
     @IBOutlet weak var pdfView: PDFView?
 
@@ -165,6 +186,8 @@ class ViewController: UIViewController {
             object: nil
         )
 
+        scheduler = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(handleTimer), userInfo: nil, repeats: true)
+
         if let pdf = pdfView {
             let doubleTap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.handleDoubleTap(sender:)))
             doubleTap.numberOfTapsRequired = 2
@@ -197,32 +220,23 @@ class ViewController: UIViewController {
     }
 
     @objc func handlePageChanged(notification: Notification) {
-        if let pdf = pdfView,
-           let doc = pdf.document,
-           let url = doc.documentURL,
-           let page = pdf.currentPage {
-            let index = doc.index(for: page)
-            let rect = pdf.convert(pdf.bounds, to:page)
-            history.save(name: url, to: index, at: rect)
-            debugPrint("handleDocumentChanged: \(index)")
-        }
+        history.save(pdfView: pdfView)
+        debugPrint("handlePageChanged")
     }
 
     @objc func handleDisplayBoxChanged(notification: Notification) {
-        if let pdf = pdfView {
-            debugPrint("handleDisplayBoxChanged: \(pdf.displayBox)")
-        }
+        debugPrint("handleDisplayBoxChanged")
     }
 
     @objc func handleScaleChanged(notification: Notification) {
-        if let pdf = pdfView,
-           let doc = pdf.document,
-           let url = doc.documentURL,
-           let page = pdf.currentPage {
-            let rect = pdf.convert(pdf.bounds, to:page)
-            let scale = pdf.scaleFactor
-            history.save(name: url, at: rect, of: scale)
-            debugPrint("handleScaleChanged: \(scale)")
+        history.save(pdfView: pdfView)
+        debugPrint("handleScaleChanged")
+    }
+
+    @objc func handleTimer(sender: AnyObject?) {
+        if pdfView?.rect() != CGRectZero && pdfView?.rect() != history.rect() {
+            history.save(pdfView: pdfView)
+            debugPrint("handleTimer")
         }
     }
 
@@ -240,11 +254,19 @@ class ViewController: UIViewController {
 
         if let color = UserDefaults.standard.object(forKey: "background") as? String? ?? ".white" {
             let toSet: UIColor = (color == ".clear") ? .clear : .white
-//            for view in pdfView?.subviews ?? [] {
+            for view in pdfView?.subviews ?? [] {
+                debugPrint("view \(view)")
+//                let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePanInScrollView(_:)))
+//                panGestureRecognizer.cancelsTouchesInView = false
+//                view.addGestureRecognizer(panGestureRecognizer)
 //                view.backgroundColor = toSet
-//            }
+            }
             pdfView?.backgroundColor = toSet
         }
+    }
+
+    @objc func handlePanInScrollView(_ sender: UIGestureRecognizer) {
+        debugPrint(sender)
     }
 
     @objc func handleActive() {
@@ -306,17 +328,21 @@ class ViewController: UIViewController {
             UserDefaults.standard.set(false, forKey: "hiddenHomeBar")
             UserDefaults.standard.set(false, forKey: "hiddenStatusBar")
             UserDefaults.standard.set(false, forKey: "dimMenuButton")
+            UserDefaults.standard.removeObject(forKey: "history")
+            UserDefaults.standard.removeObject(forKey: "latest")
+            UserDefaults.standard.synchronize()
+            history.reset()
         }
 
         hiddenHomeBar = UserDefaults.standard.bool(forKey: "hiddenHomeBar")
         self.setNeedsUpdateOfHomeIndicatorAutoHidden()
 
         hiddenStatusBar = UserDefaults.standard.bool(forKey: "hiddenStatusBar")
-        UIView.animate(withDuration: 0.25, animations: {
+        UIView.animate(withDuration: 2.0, animations: {
             self.setNeedsStatusBarAppearanceUpdate()
 
-            let alpha = UserDefaults.standard.bool(forKey: "dimMenuButton") ? 0.2 : 1.0
-            self.infoButton.alpha = 0.1
+            let alpha = UserDefaults.standard.bool(forKey: "dimMenuButton") ? 0.15 : 1.0
+            self.infoButton.alpha = 0.05
             self.menuButton.alpha = alpha
         })
     }
@@ -325,12 +351,14 @@ class ViewController: UIViewController {
         if let pdf = pdfView {
             debugPrint("isUsingPageViewController: \(pdf.isUsingPageViewController)")
             debugPrint("backgroundColor: \(pdf.backgroundColor)")
+            debugPrint("displaysAsBook: \(pdf.displaysAsBook)")
             debugPrint("displaysPageBreaks: \(pdf.displaysPageBreaks)")
             debugPrint("displayDirection: \(pdf.displayDirection)")
             debugPrint("displayMode: \(pdf.displayMode)")
             debugPrint("displayBox: \(pdf.displayBox)")
             debugPrint("displaysRTL: \(pdf.displaysRTL)")
             debugPrint("scaleFactor: \(pdf.scaleFactor)")
+            debugPrint("scaleFactorForSizeToFit: \(pdf.scaleFactorForSizeToFit)")
             debugPrint("autoScales: \(pdf.autoScales)")
             if let doc = pdf.document,
                let url = doc.documentURL {
