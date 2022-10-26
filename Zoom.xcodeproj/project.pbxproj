@@ -19,7 +19,7 @@
 
 /* Begin PBXFileReference section */
 		F50EF5152901512D0091AC37 /* PDFKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PDFKit.framework; path = System/Library/Frameworks/PDFKit.framework; sourceTree = SDKROOT; };
-		F5F051ED2901205E00DD4849 /* Book.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Book.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F5F051ED2901205E00DD4849 /* Zoom.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Zoom.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5F051F02901205E00DD4849 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F5F051F22901205E00DD4849 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		F5F051F42901205E00DD4849 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -53,7 +53,7 @@
 		F5F051E42901205E00DD4849 = {
 			isa = PBXGroup;
 			children = (
-				F5F051EF2901205E00DD4849 /* Book */,
+				F5F051EF2901205E00DD4849 /* Zoom */,
 				F5F37FC829025B08008B9D9E /* Settings.bundle */,
 				F5F051EE2901205E00DD4849 /* Products */,
 				F50EF5142901512D0091AC37 /* Frameworks */,
@@ -63,12 +63,12 @@
 		F5F051EE2901205E00DD4849 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				F5F051ED2901205E00DD4849 /* Book.app */,
+				F5F051ED2901205E00DD4849 /* Zoom.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		F5F051EF2901205E00DD4849 /* Book */ = {
+		F5F051EF2901205E00DD4849 /* Zoom */ = {
 			isa = PBXGroup;
 			children = (
 				F5F051F02901205E00DD4849 /* AppDelegate.swift */,
@@ -79,15 +79,15 @@
 				F5F051FB2901205F00DD4849 /* LaunchScreen.storyboard */,
 				F5F051FE2901205F00DD4849 /* Info.plist */,
 			);
-			path = Book;
+			path = Zoom;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		F5F051EC2901205E00DD4849 /* Book */ = {
+		F5F051EC2901205E00DD4849 /* Zoom */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F5F052012901205F00DD4849 /* Build configuration list for PBXNativeTarget "Book" */;
+			buildConfigurationList = F5F052012901205F00DD4849 /* Build configuration list for PBXNativeTarget "Zoom" */;
 			buildPhases = (
 				F5F051E92901205E00DD4849 /* Sources */,
 				F5F051EA2901205E00DD4849 /* Frameworks */,
@@ -97,9 +97,9 @@
 			);
 			dependencies = (
 			);
-			name = Book;
+			name = Zoom;
 			productName = Book;
-			productReference = F5F051ED2901205E00DD4849 /* Book.app */;
+			productReference = F5F051ED2901205E00DD4849 /* Zoom.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -117,7 +117,7 @@
 					};
 				};
 			};
-			buildConfigurationList = F5F051E82901205E00DD4849 /* Build configuration list for PBXProject "Book" */;
+			buildConfigurationList = F5F051E82901205E00DD4849 /* Build configuration list for PBXProject "Zoom" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -130,7 +130,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				F5F051EC2901205E00DD4849 /* Book */,
+				F5F051EC2901205E00DD4849 /* Zoom */,
 			);
 		};
 /* End PBXProject section */
@@ -232,7 +232,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -286,7 +286,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -305,19 +305,21 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 58479H4BXP;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Book/Info.plist;
+				INFOPLIST_FILE = Zoom/Info.plist;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportsDocumentBrowser = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.horaceho.book;
+				PRODUCT_BUNDLE_IDENTIFIER = com.horaceho.zoom;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -334,19 +336,21 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 58479H4BXP;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Book/Info.plist;
+				INFOPLIST_FILE = Zoom/Info.plist;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportsDocumentBrowser = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.horaceho.book;
+				PRODUCT_BUNDLE_IDENTIFIER = com.horaceho.zoom;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -357,7 +361,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		F5F051E82901205E00DD4849 /* Build configuration list for PBXProject "Book" */ = {
+		F5F051E82901205E00DD4849 /* Build configuration list for PBXProject "Zoom" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F5F051FF2901205F00DD4849 /* Debug */,
@@ -366,7 +370,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F5F052012901205F00DD4849 /* Build configuration list for PBXNativeTarget "Book" */ = {
+		F5F052012901205F00DD4849 /* Build configuration list for PBXNativeTarget "Zoom" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F5F052022901205F00DD4849 /* Debug */,
