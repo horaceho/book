@@ -7,12 +7,13 @@
 
 import UIKit
 import PDFKit
+import CryptoKit
 import UniformTypeIdentifiers
 
 struct Book: Codable {
     var hash: String
     var name: String
-    var path: URL
+    var path: URL?
     var page: Int = 0
     var mode: Int = 0
     var point: CGPoint = CGPointZero // of PDFDestination
@@ -47,7 +48,7 @@ struct History: Codable {
             let scale = pdf.scaleFactor
             let tofit = pdf.scaleFactorForSizeToFit
             let name = url.lastPathComponent
-            latest = String(format:"%02X", name.hashValue)
+            latest = name.md5
             if (index > 0) {
                 if let first = books.firstIndex(where: { $0.hash == latest }) {
                     books[first].page = index
@@ -138,9 +139,18 @@ extension PDFView {
     }
 }
 
+extension String {
+    var md5: String {
+        let digest = Insecure.MD5.hash(data: self.data(using: .utf8) ?? Data())
+        return digest.map {
+            String(format: "%02hhx", $0)
+        }.joined()
+    }
+}
+
 extension URL {
     func hash() -> String {
-        return String(format:"%02X", self.lastPathComponent.hashValue)
+        return self.lastPathComponent.md5
     }
 }
 
@@ -186,8 +196,16 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
             } else {
                 history.load()
                 if let book = history.book() {
-                    print("reload \(book.path.lastPathComponent)")
-                    openUrl(url: book.path)
+                    print("latest \(history.latest)")
+                    if let url = book.path, url.startAccessingSecurityScopedResource() {
+                        print("reload \(url.lastPathComponent)")
+                        defer  {
+                            url.stopAccessingSecurityScopedResource()
+                        }
+                        NotificationCenter.default.post(name: NSNotification.Name("loadUrl"), object: self, userInfo: [
+                            "url": url
+                        ])
+                    }
                 }
             }
         }
@@ -308,7 +326,7 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
     }
 
     @objc func handleLoadUrl(notification: Notification) {
-        debugPrint("openUrl")
+        debugPrint("handleLoadUrl")
         if let url = notification.userInfo?["url"] as? URL {
             openUrl(url: url)
         }
