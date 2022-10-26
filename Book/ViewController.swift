@@ -10,10 +10,14 @@ import PDFKit
 
 struct Book: Codable {
     var hash: String
-    var file: String
+    var name: String
     var path: URL
     var page: Int = 0
+    var mode: Int = 0
+    var point: CGPoint = CGPointZero // of PDFDestination
+    var zoom: CGFloat = 1.0 // of PDFDestination
     var rect: CGRect = CGRectZero
+    var auto: Bool = true
     var scale: CGFloat = 1.0
     var tofit: CGFloat = 1.0
 }
@@ -31,26 +35,39 @@ struct History: Codable {
         if let pdf = pdfView,
            let doc = pdf.document,
            let url = doc.documentURL,
-           let page = pdf.currentPage {
+           let page = pdf.currentPage,
+           let destination = pdf.currentDestination {
             let index = doc.index(for: page)
+            let mode = Int(pdf.displayMode.rawValue)
+            let point = destination.point
+            let zoom = destination.zoom
             let rect = pdf.convert(pdf.bounds, to:page)
+            let auto = pdf.autoScales
             let scale = pdf.scaleFactor
             let tofit = pdf.scaleFactorForSizeToFit
-            let file = url.lastPathComponent
-            latest = String(format:"%02X", file.hashValue)
+            let name = url.lastPathComponent
+            latest = String(format:"%02X", name.hashValue)
             if (index > 0) {
                 if let first = books.firstIndex(where: { $0.hash == latest }) {
                     books[first].page = index
+                    books[first].mode = mode
+                    books[first].point = point
+                    books[first].zoom = zoom
                     books[first].rect = rect
+                    books[first].auto = auto
                     books[first].scale = scale
                     books[first].tofit = tofit
                 } else {
                     books.append(Book(
                         hash: latest,
-                        file: file,
+                        name: name,
                         path: url,
                         page: index,
+                        mode: mode,
+                        point: point,
+                        zoom: zoom,
                         rect: rect,
+                        auto: auto,
                         scale: scale,
                         tofit: tofit
                     ))
@@ -83,9 +100,15 @@ struct History: Codable {
     func book(url: URL) -> Book? {
         if let first = books.firstIndex(where: { $0.hash == url.hash() }) {
             return books[first]
-        } else {
-            return nil
         }
+        return nil
+    }
+
+    func book() -> Book? {
+        if let first = books.firstIndex(where: { $0.hash == latest }) {
+            return books[first]
+        }
+        return nil
     }
 
     func rect() -> CGRect {
@@ -154,6 +177,19 @@ class ViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         print("viewDidAppear")
+        if let pdf = pdfView {
+            if let doc = pdf.document {
+                if let url = doc.documentURL {
+                    print("resume \(url.lastPathComponent)")
+                }
+            } else {
+                history.load()
+                if let book = history.book() {
+                    print("reload \(book.path.lastPathComponent)")
+                    openUrl(url: book.path)
+                }
+            }
+        }
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -172,7 +208,7 @@ class ViewController: UIViewController {
 
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(openUrl(notification:)),
+            selector: #selector(handleLoadUrl(notification:)),
             name: Notification.Name("loadUrl"),
             object: nil
         )
@@ -246,7 +282,8 @@ class ViewController: UIViewController {
     }
 
     @objc func handlePageChanged(notification: Notification) {
-        debugPrint("handlePageChanged")
+        let page = pdfView?.page() ?? 0
+        debugPrint("handlePageChanged \(page)")
         pdfView?.currentSelection = nil
         pdfView?.clearSelection()
         history.save(pdfView: pdfView)
@@ -262,47 +299,17 @@ class ViewController: UIViewController {
     }
 
     @objc func handleTimer(sender: AnyObject?) {
-        if let page = pdfView?.page() {
-            if page > 0 && pdfView?.rect() != CGRectZero && pdfView?.rect() != history.rect() {
-                debugPrint("handleTimer")
-                history.save(pdfView: pdfView)
-            }
+        let page = pdfView?.page() ?? 0
+        if page > 0 && pdfView?.rect() != CGRectZero && pdfView?.rect() != history.rect() {
+            debugPrint("handleTimer")
+            history.save(pdfView: pdfView)
         }
     }
 
-    @objc func openUrl(notification: Notification) {
+    @objc func handleLoadUrl(notification: Notification) {
         debugPrint("openUrl")
-        guard
-            let url = notification.userInfo?["url"] as? URL
-        else { return }
-        
-        if let pdf = pdfView {
-            let document = PDFDocument(url: url)
-            pdf.document = document
-
-            if let book = history.book(url: url) {
-                if let doc = pdf.document,
-                   let page = doc.page(at: book.page) {
-                    pdf.go(to: page)
-                }
-                pdf.displayMode = .singlePage
-            } else {
-                pdf.autoScales = true
-                pdf.displayMode = .singlePage
-            }
-            pdf.pageShadowsEnabled = false
-        }
-
-        if let color = UserDefaults.standard.object(forKey: "background") as? String? ?? ".white" {
-            let toSet: UIColor = (color == ".clear") ? .clear : .white
-            for view in pdfView?.subviews ?? [] {
-                debugPrint("view \(view)")
-//                let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePanInScrollView(_:)))
-//                panGestureRecognizer.cancelsTouchesInView = false
-//                view.addGestureRecognizer(panGestureRecognizer)
-//                view.backgroundColor = toSet
-            }
-            pdfView?.backgroundColor = toSet
+        if let url = notification.userInfo?["url"] as? URL {
+            openUrl(url: url)
         }
     }
 
@@ -312,7 +319,6 @@ class ViewController: UIViewController {
 
     @objc func handleActive() {
         print("handleActive")
-        updateHistory()
         updateSettings()
     }
 
@@ -356,9 +362,42 @@ class ViewController: UIViewController {
         gesture.setTranslation(.zero, in: view)
     }
 
-    func updateHistory() {
-        print("updateHistory")
-        history.load()
+    func openUrl(url: URL) {
+        if let pdf = pdfView {
+            let document = PDFDocument(url: url)
+            pdf.document = document
+
+            history.load()
+            if let book = history.book(url: url) {
+                if let doc = pdf.document,
+                   let page = doc.page(at: book.page) {
+                    pdf.autoScales = book.auto
+                    pdf.scaleFactor = book.scale
+                    pdf.displayMode = PDFDisplayMode(rawValue: book.mode) ?? .singlePage
+                    let destination = PDFDestination(page: page, at: book.point)
+                    destination.zoom = book.zoom
+                    pdf.go(to: destination)
+                    pdf.go(to: book.rect, on: page)
+                }
+            } else {
+                pdf.autoScales = true
+                pdf.displayMode = .singlePage
+            }
+            pdf.pageShadowsEnabled = false
+            pdf.displaysPageBreaks = false
+        }
+
+        if let color = UserDefaults.standard.object(forKey: "background") as? String? ?? ".white" {
+            let toSet: UIColor = (color == ".clear") ? .clear : .white
+            for view in pdfView?.subviews ?? [] {
+                debugPrint("view \(view)")
+//                let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePanInScrollView(_:)))
+//                panGestureRecognizer.cancelsTouchesInView = false
+//                view.addGestureRecognizer(panGestureRecognizer)
+//                view.backgroundColor = toSet
+            }
+            pdfView?.backgroundColor = toSet
+        }
     }
 
     func updateSettings() {
