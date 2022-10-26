@@ -8,26 +8,6 @@
 	<array>
 		<dict>
 			<key>Type</key>
-			<string>PSMultiValueSpecifier</string>
-			<key>Title</key>
-			<string>Background</string>
-			<key>Key</key>
-			<string>background</string>
-			<key>DefaultValue</key>
-			<string>.white</string>
-			<key>Titles</key>
-			<array>
-				<string>Clear</string>
-				<string>White</string>
-			</array>
-			<key>Values</key>
-			<array>
-				<string>.clear</string>
-				<string>.white</string>
-			</array>
-		</dict>
-		<dict>
-			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
 			<string>Hide Status Bar</string>
@@ -50,11 +30,31 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
-			<string>Dim Menu Button</string>
+			<string>Dim Menu Icons</string>
 			<key>Key</key>
-			<string>dimMenuButton</string>
+			<string>dimMenuIcons</string>
 			<key>DefaultValue</key>
 			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+			<key>Title</key>
+			<string>Background</string>
+			<key>Key</key>
+			<string>background</string>
+			<key>DefaultValue</key>
+			<string>.white</string>
+			<key>Titles</key>
+			<array>
+				<string>Clear</string>
+				<string>White</string>
+			</array>
+			<key>Values</key>
+			<array>
+				<string>.clear</string>
+				<string>.white</string>
+			</array>
 		</dict>
 		<dict>
 			<key>Type</key>

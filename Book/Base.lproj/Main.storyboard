@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -21,8 +22,20 @@
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" red="0.97288292646408081" green="0.97436553239822388" blue="0.92440634965896606" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="6fq-Ni-L1z">
+                                <rect key="frame" x="0.0" y="16" width="96" height="96"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" image="book" catalog="system">
+                                    <color key="titleColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="tapInsideBookButton" destination="BYZ-38-t0r" eventType="touchUpInside" id="yhR-n0-Jjm"/>
+                                </connections>
+                            </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="Av9-6R-5ge">
-                                <rect key="frame" x="311" y="16" width="64" height="64"/>
+                                <rect key="frame" x="279" y="16" width="96" height="96"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
@@ -30,19 +43,7 @@
                                     <color key="titleColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
                                 <connections>
-                                    <action selector="tapInsideMenuButton" destination="BYZ-38-t0r" eventType="touchUpInside" id="e4T-wh-0uR"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" alpha="0.050000000000000003" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="6fq-Ni-L1z">
-                                <rect key="frame" x="0.0" y="16" width="64" height="64"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                <state key="normal" image="info.circle" catalog="system">
-                                    <color key="titleColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                </state>
-                                <connections>
-                                    <action selector="tapInsideInfoButton" destination="BYZ-38-t0r" eventType="touchUpInside" id="8kW-4M-uAO"/>
+                                    <action selector="tapInsideMenuButton" destination="BYZ-38-t0r" eventType="touchUpInside" id="qy2-g7-et4"/>
                                 </connections>
                             </button>
                             <view hidden="YES" autoresizesSubviews="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4b6-gh-Ueq">
@@ -81,9 +82,9 @@
                         <color key="tintColor" systemColor="tintColor"/>
                     </view>
                     <connections>
+                        <outlet property="bookButton" destination="6fq-Ni-L1z" id="PLZ-7w-PW2"/>
                         <outlet property="configView" destination="4b6-gh-Ueq" id="XTX-yQ-nCH"/>
-                        <outlet property="infoButton" destination="6fq-Ni-L1z" id="9Kc-Yl-Q9U"/>
-                        <outlet property="menuButton" destination="Av9-6R-5ge" id="deY-99-b4D"/>
+                        <outlet property="menuButton" destination="Av9-6R-5ge" id="t9d-f7-vH2"/>
                         <outlet property="nextButton" destination="XMM-Rm-ecY" id="J7f-So-ZiS"/>
                         <outlet property="pdfView" destination="cU3-sT-KyD" id="0wP-aM-BHC"/>
                         <outlet property="prevButton" destination="SQM-gs-nuj" id="0B7-Nf-W0u"/>
@@ -102,8 +103,8 @@
     <resources>
         <image name="arrow.forward" catalog="system" width="128" height="95"/>
         <image name="arrow.left" catalog="system" width="128" height="95"/>
+        <image name="book" catalog="system" width="128" height="99"/>
         <image name="gearshape" catalog="system" width="128" height="123"/>
-        <image name="info.circle" catalog="system" width="128" height="123"/>
         <systemColor name="systemPurpleColor">
             <color red="0.68627450980392157" green="0.32156862745098042" blue="0.87058823529411766" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

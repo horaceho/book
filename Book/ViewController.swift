@@ -7,6 +7,7 @@
 
 import UIKit
 import PDFKit
+import UniformTypeIdentifiers
 
 struct Book: Codable {
     var hash: String
@@ -143,7 +144,7 @@ extension URL {
     }
 }
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UIDocumentPickerDelegate {
 
     var history = History(books: [])
     var hiddenHomeBar: Bool = false
@@ -152,7 +153,7 @@ class ViewController: UIViewController {
 
     @IBOutlet weak var pdfView: PDFView?
 
-    @IBOutlet var infoButton: UIView!
+    @IBOutlet var bookButton: UIView!
     @IBOutlet var menuButton: UIView!
     @IBOutlet var prevButton: UIView!
     @IBOutlet var nextButton: UIView!
@@ -322,8 +323,24 @@ class ViewController: UIViewController {
         updateSettings()
     }
 
-    @IBAction func tapInsideInfoButton() {
-        debugPrintAll()
+    @IBAction func tapInsideBookButton() {
+        let fileController = UIDocumentPickerViewController(forOpeningContentTypes: [
+            UTType.pdf
+        ])
+        fileController.allowsMultipleSelection = false
+        fileController.delegate = self
+        present(fileController, animated: true, completion: nil)
+    }
+
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        if let url = urls.first, url.startAccessingSecurityScopedResource() {
+            defer  {
+                url.stopAccessingSecurityScopedResource()
+            }
+            NotificationCenter.default.post(name: NSNotification.Name("loadUrl"), object: self, userInfo: [
+                "url": url
+            ])
+        }
     }
 
     @IBAction func tapInsideMenuButton() {
@@ -407,7 +424,7 @@ class ViewController: UIViewController {
             UserDefaults.standard.set(".white", forKey: "background")
             UserDefaults.standard.set(false, forKey: "hiddenHomeBar")
             UserDefaults.standard.set(false, forKey: "hiddenStatusBar")
-            UserDefaults.standard.set(false, forKey: "dimMenuButton")
+            UserDefaults.standard.set(false, forKey: "dimMenuIcons")
             UserDefaults.standard.removeObject(forKey: "history")
             UserDefaults.standard.removeObject(forKey: "latest")
             UserDefaults.standard.synchronize()
@@ -421,8 +438,8 @@ class ViewController: UIViewController {
         UIView.animate(withDuration: 2.0, animations: {
             self.setNeedsStatusBarAppearanceUpdate()
 
-            let alpha = UserDefaults.standard.bool(forKey: "dimMenuButton") ? 0.15 : 1.0
-            self.infoButton.alpha = 0.05
+            let alpha = UserDefaults.standard.bool(forKey: "dimMenuIcons") ? 0.1 : 1.0
+            self.bookButton.alpha = alpha
             self.menuButton.alpha = alpha
         })
     }
