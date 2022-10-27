@@ -21,9 +21,7 @@ extension String {
 extension URL {
     var name: String {
         let name = self.deletingPathExtension().lastPathComponent
-        let only = name.replacingOccurrences(of: "(-|~)([0-9]+)$", with: "", options: .regularExpression, range: nil)
-        print("name \(name) only \(only)")
-        return only
+        return name.replacingOccurrences(of: "(-|~)([0-9]+)$", with: "", options: .regularExpression, range: nil)
     }
     var hash: String {
         return self.name.md5

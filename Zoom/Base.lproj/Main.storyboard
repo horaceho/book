@@ -139,7 +139,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                 <state key="normal">
-                                    <imageReference key="image" image="xmark.circle" catalog="system" symbolScale="large"/>
+                                    <imageReference key="image" image="arrow.uturn.backward" catalog="system" symbolScale="large"/>
                                 </state>
                                 <connections>
                                     <action selector="tapInsideBackButton" destination="XRg-vC-9yB" eventType="touchUpInside" id="nRY-WS-xyN"/>
@@ -213,12 +213,12 @@
         <image name="arrow.forward" catalog="system" width="128" height="95"/>
         <image name="arrow.left" catalog="system" width="128" height="95"/>
         <image name="arrow.triangle.2.circlepath" catalog="system" width="128" height="104"/>
+        <image name="arrow.uturn.backward" catalog="system" width="128" height="113"/>
         <image name="book" catalog="system" width="128" height="99"/>
         <image name="chevron.left" catalog="system" width="97" height="128"/>
         <image name="chevron.right" catalog="system" width="97" height="128"/>
         <image name="gearshape" catalog="system" width="128" height="123"/>
         <image name="slider.horizontal.3" catalog="system" width="128" height="99"/>
-        <image name="xmark.circle" catalog="system" width="128" height="123"/>
         <systemColor name="labelColor">
             <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
