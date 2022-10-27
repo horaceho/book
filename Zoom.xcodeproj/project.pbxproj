@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F50D1EDF290A170000100593 /* PopupController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F50D1EDE290A170000100593 /* PopupController.swift */; };
+		F50D1EE1290A264600100593 /* Book.swift in Sources */ = {isa = PBXBuildFile; fileRef = F50D1EE0290A264600100593 /* Book.swift */; };
+		F50D1EE3290A26C000100593 /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = F50D1EE2290A26C000100593 /* History.swift */; };
 		F50EF5162901512D0091AC37 /* PDFKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F50EF5152901512D0091AC37 /* PDFKit.framework */; };
 		F5F051F12901205E00DD4849 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F051F02901205E00DD4849 /* AppDelegate.swift */; };
 		F5F051F32901205E00DD4849 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F051F22901205E00DD4849 /* SceneDelegate.swift */; };
@@ -18,6 +21,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		F50D1EDE290A170000100593 /* PopupController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupController.swift; sourceTree = "<group>"; };
+		F50D1EE0290A264600100593 /* Book.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Book.swift; sourceTree = "<group>"; };
+		F50D1EE2290A26C000100593 /* History.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
 		F50EF5152901512D0091AC37 /* PDFKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PDFKit.framework; path = System/Library/Frameworks/PDFKit.framework; sourceTree = SDKROOT; };
 		F5F051ED2901205E00DD4849 /* Zoom.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Zoom.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5F051F02901205E00DD4849 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -71,13 +77,16 @@
 		F5F051EF2901205E00DD4849 /* Zoom */ = {
 			isa = PBXGroup;
 			children = (
+				F50D1EE0290A264600100593 /* Book.swift */,
+				F50D1EE2290A26C000100593 /* History.swift */,
 				F5F051F02901205E00DD4849 /* AppDelegate.swift */,
 				F5F051F22901205E00DD4849 /* SceneDelegate.swift */,
 				F5F051F42901205E00DD4849 /* ViewController.swift */,
+				F50D1EDE290A170000100593 /* PopupController.swift */,
 				F5F051F62901205E00DD4849 /* Main.storyboard */,
-				F5F051F92901205F00DD4849 /* Assets.xcassets */,
 				F5F051FB2901205F00DD4849 /* LaunchScreen.storyboard */,
 				F5F051FE2901205F00DD4849 /* Info.plist */,
+				F5F051F92901205F00DD4849 /* Assets.xcassets */,
 			);
 			path = Zoom;
 			sourceTree = "<group>";
@@ -154,8 +163,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F50D1EE3290A26C000100593 /* History.swift in Sources */,
+				F50D1EDF290A170000100593 /* PopupController.swift in Sources */,
 				F5F051F52901205E00DD4849 /* ViewController.swift in Sources */,
 				F5F051F12901205E00DD4849 /* AppDelegate.swift in Sources */,
+				F50D1EE1290A264600100593 /* Book.swift in Sources */,
 				F5F051F32901205E00DD4849 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -23,7 +23,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             defer  {
                 url.stopAccessingSecurityScopedResource()
             }
-            NotificationCenter.default.post(name: NSNotification.Name("loadUrl"), object: self, userInfo: [
+            NotificationCenter.default.post(name: NSNotification.Name("LoadUrl"), object: nil, userInfo: [
                 "url": url
             ])
         }

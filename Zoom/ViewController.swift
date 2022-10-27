@@ -7,119 +7,7 @@
 
 import UIKit
 import PDFKit
-import CryptoKit
 import UniformTypeIdentifiers
-
-struct Book: Codable {
-    var hash: String
-    var name: String
-    var path: URL?
-    var page: Int = 0
-    var mode: Int = 0
-    var point: CGPoint = CGPointZero // of PDFDestination
-    var zoom: CGFloat = 1.0 // of PDFDestination
-    var rect: CGRect = CGRectZero
-    var auto: Bool = true
-    var scale: CGFloat = 1.0
-    var tofit: CGFloat = 1.0
-}
-
-struct History: Codable {
-    var books: [Book] = []
-    var latest: String = ""
-
-    mutating func reset() {
-        books = []
-        latest = ""
-    }
-
-    mutating func save(pdfView: PDFView?) {
-        if let pdf = pdfView,
-           let doc = pdf.document,
-           let url = doc.documentURL,
-           let page = pdf.currentPage,
-           let destination = pdf.currentDestination {
-            let index = doc.index(for: page)
-            let mode = Int(pdf.displayMode.rawValue)
-            let point = destination.point
-            let zoom = destination.zoom
-            let rect = pdf.convert(pdf.bounds, to:page)
-            let auto = pdf.autoScales
-            let scale = pdf.scaleFactor
-            let tofit = pdf.scaleFactorForSizeToFit
-            let name = url.lastPathComponent
-            latest = name.md5
-            if (index > 0) {
-                if let first = books.firstIndex(where: { $0.hash == latest }) {
-                    books[first].page = index
-                    books[first].mode = mode
-                    books[first].point = point
-                    books[first].zoom = zoom
-                    books[first].rect = rect
-                    books[first].auto = auto
-                    books[first].scale = scale
-                    books[first].tofit = tofit
-                } else {
-                    books.append(Book(
-                        hash: latest,
-                        name: name,
-                        path: url,
-                        page: index,
-                        mode: mode,
-                        point: point,
-                        zoom: zoom,
-                        rect: rect,
-                        auto: auto,
-                        scale: scale,
-                        tofit: tofit
-                    ))
-                }
-
-                if let data = try? JSONEncoder().encode(books) {
-                    UserDefaults.standard.set(data, forKey: "history")
-                }
-                UserDefaults.standard.set(latest, forKey: "latest")
-                UserDefaults.standard.synchronize()
-                debugPrint("save \(latest)")
-            } else {
-                debugPrint("save \(latest) ignored")
-            }
-        }
-    }
-
-    mutating func load() {
-        if let hash = UserDefaults.standard.string(forKey: "latest") {
-            latest = hash
-        }
-        if let data = UserDefaults.standard.data(forKey: "history") {
-            if let decoded = try? JSONDecoder().decode([Book].self, from: data) {
-                books = decoded
-            }
-        }
-        debugPrint("load \(latest)")
-    }
-
-    func book(url: URL) -> Book? {
-        if let first = books.firstIndex(where: { $0.hash == url.hash() }) {
-            return books[first]
-        }
-        return nil
-    }
-
-    func book() -> Book? {
-        if let first = books.firstIndex(where: { $0.hash == latest }) {
-            return books[first]
-        }
-        return nil
-    }
-
-    func rect() -> CGRect {
-        if let index = books.firstIndex(where: { $0.hash == latest }) {
-            return books[index].rect
-        }
-        return CGRectZero
-    }
-}
 
 extension PDFView {
     func page() -> Int {
@@ -136,21 +24,6 @@ extension PDFView {
         } else {
             return CGRectZero
         }
-    }
-}
-
-extension String {
-    var md5: String {
-        let digest = Insecure.MD5.hash(data: self.data(using: .utf8) ?? Data())
-        return digest.map {
-            String(format: "%02hhx", $0)
-        }.joined()
-    }
-}
-
-extension URL {
-    func hash() -> String {
-        return self.lastPathComponent.md5
     }
 }
 
@@ -191,18 +64,18 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
         if let pdf = pdfView {
             if let doc = pdf.document {
                 if let url = doc.documentURL {
-                    print("resume \(url.lastPathComponent)")
+                    print("resume \(url.name)")
                 }
             } else {
                 history.load()
                 if let book = history.book() {
                     print("latest \(history.latest)")
                     if let url = book.path, url.startAccessingSecurityScopedResource() {
-                        print("reload \(url.lastPathComponent)")
+                        print("reload \(url.name)")
                         defer  {
                             url.stopAccessingSecurityScopedResource()
                         }
-                        NotificationCenter.default.post(name: NSNotification.Name("loadUrl"), object: self, userInfo: [
+                        NotificationCenter.default.post(name: NSNotification.Name("LoadUrl"), object: nil, userInfo: [
                             "url": url
                         ])
                     }
@@ -228,7 +101,14 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleLoadUrl(notification:)),
-            name: Notification.Name("loadUrl"),
+            name: Notification.Name("LoadUrl"),
+            object: nil
+        )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleTurnPage(notification:)),
+            name: Notification.Name("TurnPage"),
             object: nil
         )
 
@@ -332,6 +212,17 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
         }
     }
 
+    @objc func handleTurnPage(notification: Notification) {
+        debugPrint("handleTurnPage")
+        if let index = notification.userInfo?["index"] as? Int {
+            if let pdf = pdfView,
+               let doc = pdf.document,
+               let page = doc.page(at: index) {
+                    pdf.go(to: page)
+            }
+        }
+    }
+
     @objc func handlePanInScrollView(_ sender: UIGestureRecognizer) {
         debugPrint(sender)
     }
@@ -355,16 +246,14 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
             defer  {
                 url.stopAccessingSecurityScopedResource()
             }
-            NotificationCenter.default.post(name: NSNotification.Name("loadUrl"), object: self, userInfo: [
+            NotificationCenter.default.post(name: NSNotification.Name("LoadUrl"), object: nil, userInfo: [
                 "url": url
             ])
         }
     }
 
     @IBAction func tapInsideMenuButton() {
-        if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
-            UIApplication.shared.open(settingsUrl)
-        }
+        //
     }
 
     @IBAction func tapInsidePrevButton() {
@@ -405,7 +294,7 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
             history.load()
             if let book = history.book(url: url) {
                 if let doc = pdf.document,
-                   let page = doc.page(at: book.page) {
+                   let page = doc.page(at: book.index) {
                     pdf.autoScales = book.auto
                     pdf.scaleFactor = book.scale
                     pdf.displayMode = PDFDisplayMode(rawValue: book.mode) ?? .singlePage
@@ -425,11 +314,10 @@ class ViewController: UIViewController, UIDocumentPickerDelegate {
         if let color = UserDefaults.standard.object(forKey: "background") as? String? ?? ".white" {
             let toSet: UIColor = (color == ".clear") ? .clear : .white
             for view in pdfView?.subviews ?? [] {
-                debugPrint("view \(view)")
 //                let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePanInScrollView(_:)))
 //                panGestureRecognizer.cancelsTouchesInView = false
 //                view.addGestureRecognizer(panGestureRecognizer)
-//                view.backgroundColor = toSet
+                view.backgroundColor = toSet
             }
             pdfView?.backgroundColor = toSet
         }
