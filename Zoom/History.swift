@@ -21,7 +21,7 @@ extension String {
 extension URL {
     var name: String {
         let name = self.deletingPathExtension().lastPathComponent
-        return name.replacingOccurrences(of: "(-|~)([0-9]+)$", with: "", options: .regularExpression, range: nil)
+        return name // .replacingOccurrences(of: "(-|~)([0-9]+)$", with: "", options: .regularExpression, range: nil)
     }
     var hash: String {
         return self.name.md5
@@ -53,7 +53,7 @@ struct History: Codable {
             let scale = pdf.scaleFactor
             let tofit = pdf.scaleFactorForSizeToFit
             let name = url.name
-            latest = name.md5
+            latest = url.hash
             if (index > 0) {
                 if let first = books.firstIndex(where: { $0.code == latest }) {
                     books[first].index = index
